@@ -3,6 +3,8 @@ import { NextResponse } from 'next/server'
 
 export async function GET(request) {
   try {
+    console.log('🔄 Fetching appointments...')
+    
     const { searchParams } = new URL(request.url)
     const date = searchParams.get('date')
     
@@ -45,16 +47,21 @@ export async function GET(request) {
       ]
     })
 
+    console.log(`✅ Found ${appointments.length} appointments`)
     return NextResponse.json(appointments)
+    
   } catch (error) {
-    console.error('Error fetching appointments:', error)
-    return NextResponse.json({ error: 'Error fetching appointments' }, { status: 500 })
+    console.error('❌ Error fetching appointments:', error)
+    
+    // Retornar array vacío en caso de error
+    return NextResponse.json([])
   }
 }
 
 export async function POST(request) {
   try {
     const data = await request.json()
+    console.log('🔄 Creating appointment for patient:', data.patientId)
     
     // Verificar conflictos de horario
     const existingAppointment = await prisma.appointment.findFirst({
@@ -110,9 +117,11 @@ export async function POST(request) {
       }
     })
 
+    console.log('✅ Appointment created:', appointment.id)
     return NextResponse.json(appointment)
+    
   } catch (error) {
-    console.error('Error creating appointment:', error)
+    console.error('❌ Error creating appointment:', error)
     return NextResponse.json({ error: 'Error creating appointment' }, { status: 500 })
   }
 }

@@ -3,6 +3,8 @@ import { NextResponse } from 'next/server'
 
 export async function GET(request) {
   try {
+    console.log('🔄 Fetching medical records...')
+    
     const { searchParams } = new URL(request.url)
     const patientId = searchParams.get('patientId')
     const doctorId = searchParams.get('doctorId')
@@ -40,16 +42,21 @@ export async function GET(request) {
       orderBy: { consultationDate: 'desc' }
     })
 
+    console.log(`✅ Found ${medicalRecords.length} medical records`)
     return NextResponse.json(medicalRecords)
+    
   } catch (error) {
-    console.error('Error fetching medical records:', error)
-    return NextResponse.json({ error: 'Error fetching medical records' }, { status: 500 })
+    console.error('❌ Error fetching medical records:', error)
+    
+    // Retornar array vacío en caso de error
+    return NextResponse.json([])
   }
 }
 
 export async function POST(request) {
   try {
     const data = await request.json()
+    console.log('🔄 Creating medical record for patient:', data.patientId)
     
     const medicalRecord = await prisma.medicalRecord.create({
       data: {
@@ -78,9 +85,11 @@ export async function POST(request) {
       }
     })
 
+    console.log('✅ Medical record created:', medicalRecord.id)
     return NextResponse.json(medicalRecord)
+    
   } catch (error) {
-    console.error('Error creating medical record:', error)
+    console.error('❌ Error creating medical record:', error)
     return NextResponse.json({ error: 'Error creating medical record' }, { status: 500 })
   }
 }
