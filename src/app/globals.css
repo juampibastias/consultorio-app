@@ -24,3 +24,30 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Estilos para React Big Calendar */
+.rbc-calendar {
+  font-family: inherit;
+}
+
+.rbc-header {
+  font-weight: 600;
+  color: #374151;
+}
+
+.rbc-today {
+  background-color: #dbeafe;
+}
+
+.rbc-event {
+  font-size: 12px;
+  padding: 2px 4px;
+}
+
+.rbc-selected {
+  background-color: #1d4ed8;
+}
+
+.rbc-slot-selection {
+  background-color: rgba(59, 130, 246, 0.1);
+}
