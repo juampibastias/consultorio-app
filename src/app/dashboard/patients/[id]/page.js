@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
@@ -10,11 +10,7 @@ export default function PatientDetailPage({ params }) {
   const [loading, setLoading] = useState(true)
   const router = useRouter()
 
-  useEffect(() => {
-    fetchPatient()
-  }, [params.id])
-
-  const fetchPatient = async () => {
+  const fetchPatient = useCallback(async () => {
     try {
       const response = await fetch(`/api/patients/${params.id}`)
       if (response.ok) {
@@ -29,7 +25,11 @@ export default function PatientDetailPage({ params }) {
     } finally {
       setLoading(false)
     }
-  }
+  }, [params.id, router])
+
+  useEffect(() => {
+    fetchPatient()
+  }, [fetchPatient])
 
   const formatDate = (dateString) => {
     if (!dateString) return '-'
