@@ -1,10 +1,7 @@
 import NextAuth from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
-import { PrismaAdapter } from "@next-auth/prisma-adapter"
-import { prisma } from '@/lib/prisma'
 
 const handler = NextAuth({
-  adapter: PrismaAdapter(prisma),
   providers: [
     CredentialsProvider({
       name: 'credentials',
@@ -16,20 +13,14 @@ const handler = NextAuth({
         try {
           console.log('🔍 Intentando autenticar:', credentials.email)
           
-          // Buscar usuario en la base de datos
-          const user = await prisma.user.findUnique({
-            where: { email: credentials.email }
-          })
-          
-          console.log('👤 Usuario encontrado:', user ? 'Sí' : 'No')
-          
-          if (user && credentials.email === 'admin@consultorio.com' && credentials.password === 'admin123') {
+          // Validación simple para el usuario administrador
+          if (credentials.email === 'admin@consultorio.com' && credentials.password === 'admin123') {
             console.log('✅ Credenciales válidas')
-            return { 
-              id: user.id, 
-              email: user.email, 
-              name: user.name,
-              role: user.role
+            return {
+              id: '1',
+              email: 'admin@consultorio.com',
+              name: 'Dr. Administrador',
+              role: 'DOCTOR'
             }
           }
           
@@ -65,7 +56,8 @@ const handler = NextAuth({
       return session
     },
   },
-  debug: process.env.NODE_ENV === 'development'
+  secret: process.env.NEXTAUTH_SECRET,
+  debug: false // Desactivar debug para reducir logs
 })
 
 export { handler as GET, handler as POST }
