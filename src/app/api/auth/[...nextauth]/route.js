@@ -13,33 +13,59 @@ const handler = NextAuth({
         password: { label: 'Password', type: 'password' }
       },
       async authorize(credentials) {
-        // Validación temporal básica
-        if (credentials.email === 'admin@consultorio.com' && credentials.password === 'admin123') {
-          let user = await prisma.user.findUnique({
+        try {
+          console.log('🔍 Intentando autenticar:', credentials.email)
+          
+          // Buscar usuario en la base de datos
+          const user = await prisma.user.findUnique({
             where: { email: credentials.email }
           })
           
-          // Crear usuario si no existe
-          if (!user) {
-            user = await prisma.user.create({
-              data: {
-                email: credentials.email,
-                name: 'Administrador',
-                role: 'ADMIN'
-              }
-            })
+          console.log('👤 Usuario encontrado:', user ? 'Sí' : 'No')
+          
+          if (user && credentials.email === 'admin@consultorio.com' && credentials.password === 'admin123') {
+            console.log('✅ Credenciales válidas')
+            return { 
+              id: user.id, 
+              email: user.email, 
+              name: user.name,
+              role: user.role
+            }
           }
           
-          return { id: user.id, email: user.email, name: user.name }
+          console.log('❌ Credenciales inválidas')
+          return null
+          
+        } catch (error) {
+          console.error('❌ Error en autorización:', error)
+          return null
         }
-        return null
       }
     })
   ],
-  session: { strategy: 'jwt' },
+  session: { 
+    strategy: 'jwt',
+    maxAge: 30 * 24 * 60 * 60, // 30 días
+  },
   pages: {
     signIn: '/login'
-  }
+  },
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.role = user.role
+      }
+      return token
+    },
+    async session({ session, token }) {
+      if (token) {
+        session.user.id = token.sub
+        session.user.role = token.role
+      }
+      return session
+    },
+  },
+  debug: process.env.NODE_ENV === 'development'
 })
 
 export { handler as GET, handler as POST }
