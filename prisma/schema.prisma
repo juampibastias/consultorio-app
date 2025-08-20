@@ -16,6 +16,8 @@ model User {
   
   appointments Appointment[]
   medicalRecords MedicalRecord[]
+
+  @@map("User")
 }
 
 model Patient {
@@ -31,6 +33,8 @@ model Patient {
   
   appointments   Appointment[]
   medicalRecords MedicalRecord[]
+
+  @@map("Patient")
 }
 
 model Appointment {
@@ -44,8 +48,10 @@ model Appointment {
   notes     String?
   createdAt DateTime @default(now())
   
-  patient Patient @relation(fields: [patientId], references: [id])
-  doctor  User    @relation(fields: [doctorId], references: [id])
+  patient Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  doctor  User    @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+
+  @@map("Appointment")
 }
 
 model MedicalRecord {
@@ -54,11 +60,13 @@ model MedicalRecord {
   doctorId         String
   consultationDate DateTime @default(now())
   diagnosis        String?
-  treatment        String?
+  treatment        String?  @db.Text
   prescriptions    Json?
-  notes            String?
+  notes            String?  @db.Text
   attachments      Json?
   
-  patient Patient @relation(fields: [patientId], references: [id])
-  doctor  User    @relation(fields: [doctorId], references: [id])
+  patient Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  doctor  User    @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+
+  @@map("MedicalRecord")
 }
