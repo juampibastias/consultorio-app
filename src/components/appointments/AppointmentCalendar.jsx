@@ -67,7 +67,7 @@ export default function AppointmentCalendar({ appointments, onSelectSlot, onSele
   }
 
   return (
-    <div className="bg-white p-4 rounded-lg shadow">
+    <div className="bg-white p-4 rounded-lg shadow text-black">
       <div className="h-96 lg:h-[600px]">
         <Calendar
           localizer={localizer}
